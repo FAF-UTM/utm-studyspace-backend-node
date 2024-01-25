@@ -1,9 +1,10 @@
 const User = require("../Models/UserModel");
 const jwt = require("jsonwebtoken");
 
+
 const maxAge = 3 * 24 * 60 * 60;
 const createToken = (id) => {
-    return jwt.sign({ id }, "kishan sheth super secret key", {
+    return jwt.sign({ id }, "Super secret key", {
         expiresIn: maxAge,
     });
 };
@@ -36,8 +37,12 @@ const handleErrors = (err) => {
 
 module.exports.register = async (req, res, next) => {
     try {
-        const { email, password } = req.body;
-        const user = await User.create({ email, password });
+
+        const { username, email, password } = req.body;
+        const usernameCheck = await User.findOne({ username });
+        if (usernameCheck)
+            return res.json({ errors, status: false });
+        const user = await User.create({ username, email, password });
         const token = createToken(user._id);
 
         res.cookie("jwt", token, {
@@ -66,3 +71,4 @@ module.exports.login = async (req, res) => {
         res.json({ errors, status: false });
     }
 };
+

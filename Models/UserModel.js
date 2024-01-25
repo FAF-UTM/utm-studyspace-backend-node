@@ -2,6 +2,12 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
+
+    username: {
+        type: String,
+        required: [true, "username is Required"],
+        unique: true,
+    },
     email: {
         type: String,
         required: [true, "Email is Required"],
@@ -10,6 +16,14 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, "Password is Required"],
+    },
+    isAvatarImageSet: {
+        type: Boolean,
+        default: false,
+    },
+    avatarImage: {
+        type: String,
+        default: "",
     },
 });
 

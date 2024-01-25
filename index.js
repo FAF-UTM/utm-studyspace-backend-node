@@ -3,7 +3,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const authRoutes = require("./Routes/AuthRouters");
 const cookieParser = require("cookie-parser");
-
+require("dotenv").config();
 const app = express();
 
 app.listen(4000, (err) => {
@@ -15,9 +15,9 @@ app.listen(4000, (err) => {
 });
 
 mongoose
-    .connect("mongodb://localhost:27017/jwt", {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
+    .connect(process.env.MONGO_URL, {
+       // useNewUrlParser: true,
+      //  useUnifiedTopology: true,
     })
     .then(() => {
         console.log("DB Connetion Successfull");
@@ -28,12 +28,16 @@ mongoose
 
 app.use(
     cors({
-        origin: ["http://localhost:5173"],
+        origin: [process.env.FRONT_URL],
         methods: ["GET", "POST"],
         credentials: true,
     })
 );
 app.use(cookieParser());
+
+
+
+
 
 app.use(express.json());
 app.use("/", authRoutes);
