@@ -72,3 +72,32 @@ module.exports.login = async (req, res) => {
     }
 };
 
+
+
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+module.exports.googleLogin = async (req, res) => {
+    const { token } = req.body;
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const { name, email, picture } = ticket.getPayload();
+
+        // Check if user exists in DB or create a new one
+        let user = await User.findOne({ email });
+        if (!user) {
+            user = await User.create({ username: name, email, password: 'your-random-password' });
+        }
+
+        // Create JWT token
+        const jwtToken = createToken(user._id);
+        res.cookie("jwt", jwtToken, { httpOnly: false, maxAge: maxAge * 1000 });
+
+        res.status(200).json({ user: user._id, status: true });
+    } catch (error) {
+        res.status(400).json({ error: "Google authentication failed" });
+    }
+};
