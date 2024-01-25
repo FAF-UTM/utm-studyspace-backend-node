@@ -35,10 +35,19 @@ const handleErrors = (err) => {
     return errors;
 };
 
+
+const isStrongPassword = (password) => {
+    const regex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$");
+    return regex.test(password);
+};
+
 module.exports.register = async (req, res, next) => {
     try {
-
         const { username, email, password } = req.body;
+        if (!isStrongPassword(password)) {
+            return res.status(400).json({ error: "Password is not strong enough." });
+        }
+
         const usernameCheck = await User.findOne({ username });
         if (usernameCheck)
             return res.json({ errors, status: false });
